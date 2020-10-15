@@ -28,6 +28,7 @@ import {
   FoodPricing,
 } from './styles';
 
+
 interface Food {
   id: number;
   name: string;
@@ -37,13 +38,17 @@ interface Food {
   formattedPrice: string;
 }
 
+
 interface Category {
   id: number;
   title: string;
   image_url: string;
 }
 
+
 const Dashboard: React.FC = () => {
+
+
   const [foods, setFoods] = useState<Food[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<
@@ -53,34 +58,66 @@ const Dashboard: React.FC = () => {
 
   const navigation = useNavigation();
 
+
+  /** Navegar para a tela de detalhamento do prato. */
   async function handleNavigate(id: number): Promise<void> {
-    // Navigate do ProductDetails page
+
+    navigation.navigate('FoodDetails', { id });
   }
 
+
   useEffect(() => {
+
+    /** Carregar os pratos, respeitando os filtros ativos. */
     async function loadFoods(): Promise<void> {
-      // Load Foods from API
+      const response = await api.get('/foods', {
+        params: {
+          category_like: selectedCategory,
+          name_like: searchValue,
+        }
+      });
+
+      setFoods(response.data.map((food: Food) => ({
+        ...food,
+        formattedPrice: formatValue(food.price),
+      })));
     }
 
     loadFoods();
   }, [selectedCategory, searchValue]);
 
+
   useEffect(() => {
+
+    /** Carregar todas as categorias. */
     async function loadCategories(): Promise<void> {
-      // Load categories from API
+      const response = await api.get('/categories');
+
+      setCategories(response.data);
     }
 
     loadCategories();
   }, []);
 
+
+  /** Ativar/desativar seleção de categoria. */
   function handleSelectCategory(id: number): void {
-    // Select / deselect category
+
+    if (selectedCategory === id) {
+      // Se a categoria já estiver selecionada, desativa a seleção
+      setSelectedCategory(undefined);
+    } else {
+      // Se a categoria não estiver selecionada, ativa a seleção
+      setSelectedCategory(id);
+    }
   }
+
 
   return (
     <Container>
       <Header>
         <Image source={Logo} />
+
         <Icon
           name="log-out"
           size={24}
@@ -88,6 +125,7 @@ const Dashboard: React.FC = () => {
           onPress={() => navigation.navigate('Home')}
         />
       </Header>
+
       <FilterContainer>
         <SearchInput
           value={searchValue}
@@ -95,9 +133,11 @@ const Dashboard: React.FC = () => {
           placeholder="Qual comida você procura?"
         />
       </FilterContainer>
+
       <ScrollView>
         <CategoryContainer>
           <Title>Categorias</Title>
+
           <CategorySlider
             contentContainerStyle={{
               paddingHorizontal: 20,
@@ -122,8 +162,10 @@ const Dashboard: React.FC = () => {
             ))}
           </CategorySlider>
         </CategoryContainer>
+
         <FoodsContainer>
           <Title>Pratos</Title>
+
           <FoodList>
             {foods.map(food => (
               <Food
@@ -138,9 +180,12 @@ const Dashboard: React.FC = () => {
                     source={{ uri: food.thumbnail_url }}
                   />
                 </FoodImageContainer>
+
                 <FoodContent>
                   <FoodTitle>{food.name}</FoodTitle>
+
                   <FoodDescription>{food.description}</FoodDescription>
+
                   <FoodPricing>{food.formattedPrice}</FoodPricing>
                 </FoodContent>
               </Food>
@@ -150,6 +195,9 @@ const Dashboard: React.FC = () => {
       </ScrollView>
     </Container>
   );
+
+
 };
+
 
 export default Dashboard;

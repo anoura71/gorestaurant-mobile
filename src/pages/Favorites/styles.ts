@@ -6,8 +6,8 @@ interface Food {
   name: string;
   description: string;
   price: number;
+  formattedPrice: number;
   thumbnail_url: string;
-  formattedPrice: string;
 }
 
 export const Container = styled.View`

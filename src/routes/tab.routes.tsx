@@ -7,7 +7,9 @@ import Dashboard from '../pages/Dashboard';
 import Favorites from '../pages/Favorites';
 import Orders from '../pages/Orders';
 
+
 const Tab = createBottomTabNavigator();
+
 
 const TabRoutes: React.FC = () => (
   <Tab.Navigator
@@ -30,6 +32,7 @@ const TabRoutes: React.FC = () => (
       name="DashboardStack"
       component={Dashboard}
     />
+
     <Tab.Screen
       name="Orders"
       options={{
@@ -53,5 +56,6 @@ const TabRoutes: React.FC = () => (
     />
   </Tab.Navigator>
 );
+
 
 export default TabRoutes;

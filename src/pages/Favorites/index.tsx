@@ -18,25 +18,38 @@ import {
   FoodPricing,
 } from './styles';
 
+
 interface Food {
   id: number;
   name: string;
   description: string;
   price: number;
+  formattedPrice: number;
   thumbnail_url: string;
-  formattedPrice: string;
 }
 
+
 const Favorites: React.FC = () => {
+
+
   const [favorites, setFavorites] = useState<Food[]>([]);
 
+
   useEffect(() => {
+
+    /** Carregar os favoritos. */
     async function loadFavorites(): Promise<void> {
-      // Load favorite foods from api
+      const response = await api.get('/favorites');
+
+      setFavorites(response.data.map((favorite: Food) => ({
+        ...favorite,
+        formattedPrice: formatValue(favorite.price),
+      })));
     }
 
     loadFavorites();
   }, []);
+
 
   return (
     <Container>
@@ -49,16 +62,19 @@ const Favorites: React.FC = () => {
           data={favorites}
           keyExtractor={item => String(item.id)}
           renderItem={({ item }) => (
-            <Food activeOpacity={0.6}>
+            <Food key={item.id} activeOpacity={0.6}>
               <FoodImageContainer>
                 <Image
                   style={{ width: 88, height: 88 }}
                   source={{ uri: item.thumbnail_url }}
                 />
               </FoodImageContainer>
+
               <FoodContent>
                 <FoodTitle>{item.name}</FoodTitle>
+
                 <FoodDescription>{item.description}</FoodDescription>
+
                 <FoodPricing>{item.formattedPrice}</FoodPricing>
               </FoodContent>
             </Food>
@@ -67,6 +83,9 @@ const Favorites: React.FC = () => {
       </FoodsContainer>
     </Container>
   );
+
+
 };
+
 
 export default Favorites;

@@ -18,25 +18,38 @@ import {
   FoodPricing,
 } from './styles';
 
+
 interface Food {
   id: number;
   name: string;
   description: string;
   price: number;
-  formattedValue: number;
+  formattedPrice: number;
   thumbnail_url: string;
 }
 
+
 const Orders: React.FC = () => {
+
+
   const [orders, setOrders] = useState<Food[]>([]);
 
+
   useEffect(() => {
+
+    /** Carregar os pedidos. */
     async function loadOrders(): Promise<void> {
-      // Load orders from API
+      const response = await api.get('/orders');
+
+      setOrders(response.data.map((order: Food) => ({
+        ...order,
+        formattedPrice: formatValue(order.price),
+      })));
     }
 
     loadOrders();
   }, []);
+
 
   return (
     <Container>
@@ -56,9 +69,12 @@ const Orders: React.FC = () => {
                   source={{ uri: item.thumbnail_url }}
                 />
               </FoodImageContainer>
+
               <FoodContent>
                 <FoodTitle>{item.name}</FoodTitle>
+
                 <FoodDescription>{item.description}</FoodDescription>
+
                 <FoodPricing>{item.formattedPrice}</FoodPricing>
               </FoodContent>
             </Food>
